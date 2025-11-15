@@ -19,5 +19,4 @@ A real-time **speech-to-speech translation** app using:
 
 ---
 
-## **Folder Structure**
 
