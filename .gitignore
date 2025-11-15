@@ -1,0 +1,15 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Audio/video temp files
+*.mp3
+*.wav
+
+# Model checkpoints
+*.pt
+*.bin
+
+# Other cache folders
+*.cache/
