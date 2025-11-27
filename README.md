@@ -1,3 +1,13 @@
+metadata
+title: Speech To Speech Translator
+emoji: 🔊
+colorFrom: blue
+colorTo: green
+sdk: gradio
+sdk_version: 5.49.1
+app_file: app.py
+pinned: false
+
 # Speech-to-Speech Translator 🈺
 
 A real-time multilingual speech translation system that converts speech between English, Hindi, and 10+ other Indian languages using state-of-the-art AI models.
