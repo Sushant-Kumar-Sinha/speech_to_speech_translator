@@ -51,8 +51,9 @@ Translated Audio Output
 ### Installation
 
 1. **Clone the repository**
-   ---bash
+   
 git clone https://github.com/Sushant-Kumar-Sinha/speech_to_speech_translator.git
+
 cd speech_to_speech_translato
 
 Usage:-
@@ -87,6 +88,9 @@ Gradio for the web interface
 
 📞 Contact
 Sushant Kumar Sinha
+
 GitHub: @Sushant-Kumar-Sinha
+
 Hugging Face: @Sushant-Kumar-Sinha
+
 Project Link: https://github.com/Sushant-Kumar-Sinha/speech_to_speech_translator
