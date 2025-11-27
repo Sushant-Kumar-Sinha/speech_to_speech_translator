@@ -46,15 +46,21 @@ global_translator = GlobalTranslator.get_instance()
 class AudioProcessor:
     def __init__(self, translator: LowLatencyTranslator):
         self.translator = translator
-        self.current_transcription = ""
-        self.current_translation = ""
-        self.last_update_time = 0
-        self.translation_history = []
-        self.max_history_items = 10
+        # These will be reset per session
         self.status = "connected"
         self.current_source_lang = "english"
         self.current_target_lang = "hindi"
-        self.last_tts_file = None  # ✅ Track TTS files for cleanup
+        self.last_tts_file = None
+
+    def get_session_state(self):
+        """Get or create session state for current user"""
+        return {
+            'current_transcription': "",
+            'current_translation': "", 
+            'last_update_time': 0,
+            'translation_history': [],
+            'max_history_items': 10
+        }
 
     def cleanup_previous_tts(self):
         """Clean up only the previous TTS file"""
@@ -87,7 +93,7 @@ class AudioProcessor:
             print(f"❌ Language change error: {e}")
             return f"❌ Error changing languages: {str(e)}", "error"
 
-    def add_to_history(self, original, translated):
+    def add_to_history(self, state, original, translated):
         """Add translation to history"""
         history_item = {
             'original': original,
@@ -96,18 +102,18 @@ class AudioProcessor:
             'source_lang': self.current_source_lang,
             'target_lang': self.current_target_lang
         }
-        self.translation_history.insert(0, history_item)
+        state['translation_history'].insert(0, history_item)
         
-        if len(self.translation_history) > self.max_history_items:
-            self.translation_history.pop()
+        if len(state['translation_history']) > state['max_history_items']:
+            state['translation_history'].pop()
 
-    def get_history_display(self):
+    def get_history_display(self, state):
         """Get formatted history for display"""
-        if not self.translation_history:
+        if not state['translation_history']:
             return "No translations yet. Upload an audio or video file!"
         
         history_html = "<div style='max-height: 300px; overflow-y: auto;'>"
-        for item in self.translation_history:
+        for item in state['translation_history']:
             history_html += f"""
             <div style="background: white; border: 1px solid #e9ecef; border-radius: 8px; padding: 1rem; margin-bottom: 0.5rem; font-size: 0.9rem;">
                 <div style="color: #495057 !important ; margin-bottom: 0.25rem;"><strong>Original ({item['source_lang']}):</strong> {item['original']}</div>
@@ -118,24 +124,10 @@ class AudioProcessor:
         history_html += "</div>"
         return history_html
 
-    def get_current_results(self):
-        """Get current transcription and translation"""
-        current_time = time.strftime('%H:%M:%S')
-        
-        original_info = f"Detected speech ({current_time})" if self.current_transcription else "Waiting for input..."
-        translated_info = f"Translated to {self.current_target_lang} ({current_time})" if self.current_translation else "Waiting for translation..."
-        
-        return (
-            self.current_transcription or "Your speech will be transcribed here...", 
-            self.current_translation or "Translation will appear here...",
-            original_info,
-            translated_info
-        )
-
-    def process_audio_file(self, file_path: str):
+    def process_audio_file(self, state, file_path: str):
         try:
             if not file_path:
-                return "❌ Please select an audio file first.", "error", None
+                return state, "❌ Please select an audio file first.", "error", None
     
             print(f"🎵 PROCESSING AUDIO FILE: {self.translator.source_lang} → {self.translator.target_lang}")
             self.status = "processing"
@@ -182,11 +174,12 @@ class AudioProcessor:
                 )
                 print(f"🌐 [{self.translator.target_lang}] File Translation: {translated}")
                 
-                self.current_transcription = transcription
-                self.current_translation = translated
-                self.last_update_time = time.time()
+                # Update session state
+                state['current_transcription'] = transcription
+                state['current_translation'] = translated
+                state['last_update_time'] = time.time()
                 
-                self.add_to_history(transcription, translated)
+                self.add_to_history(state, transcription, translated)
                 
                 # TTS with cleanup
                 tts_file = self.translator.tts.text_to_speech(translated, self.translator.target_lang)
@@ -212,18 +205,18 @@ class AudioProcessor:
             
             print("✅ Audio file processing completed")
             self.status = "connected"
-            return "✅ Audio file processed successfully!", "connected", tts_file
+            return state, "✅ Audio file processed successfully!", "connected", tts_file
     
         except Exception as e:
             logger.error(f"Audio file processing error: {e}")
             self.status = "error"
-            return f"❌ Error processing audio: {str(e)}", "error", None
+            return state, f"❌ Error processing audio: {str(e)}", "error", None
 
-    def process_video_file(self, file_path: str):
+    def process_video_file(self, state, file_path: str):
         """Process video file - WORKS ON HUGGING FACE (ffmpeg available)"""
         try:
             if not file_path:
-                return "❌ Please select a video file first.", "error", None
+                return state, "❌ Please select a video file first.", "error", None
 
             print(f"🎥 PROCESSING VIDEO FILE: {self.translator.source_lang} → {self.translator.target_lang}")
             self.status = "processing"
@@ -244,45 +237,26 @@ class AudioProcessor:
             print("✅ Video audio extracted")
             
             # Process the extracted audio and get TTS file
-            res_msg, status, tts_file = self.process_audio_file(audio_path)
+            state, res_msg, status, tts_file = self.process_audio_file(state, audio_path)
             
             # Cleanup
             if os.path.exists(audio_path):
                 os.unlink(audio_path)
             
             self.status = "connected"
-            return "✅ Video file processed successfully!", "connected", tts_file
+            return state, "✅ Video file processed successfully!", "connected", tts_file
 
         except Exception as e:
             logger.error(f"Video file processing error: {e}")
             self.status = "error"
-            return f"❌ Error processing video: {str(e)}", "error", None
-
-    def get_status_info(self):
-        """Get current status information"""
-        status_texts = {
-            "disconnected": "Disconnected",
-            "connected": "Connected", 
-            "processing": "Processing File...",
-            "error": "Error"
-        }
-        
-        status_colors = {
-            "disconnected": "red",
-            "connected": "green",
-            "processing": "orange",
-            "error": "red"
-        }
-        
-        current_languages = f"{self.current_source_lang.title()} → {self.current_target_lang.title()}"
-        
-        return status_texts.get(self.status, "Unknown"), status_colors.get(self.status, "gray"), current_languages
+            return state, f"❌ Error processing video: {str(e)}", "error", None
 
 # Create global processor instance
 processor = AudioProcessor(GlobalTranslator.get_instance())
 
 def create_interface():
     custom_css = r"""
+    /* your existing CSS remains the same */
     body { background: linear-gradient(180deg,#efe9ff 0%,#efeef8 100%); font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif; }
     .gradio-container { padding:28px 36px !important; }
     
@@ -391,6 +365,9 @@ def create_interface():
     """
 
     with gr.Blocks(css=custom_css, title="File Speech Translator") as demo:
+        # Use Gradio's session state for user-specific data
+        session_state = gr.State(processor.get_session_state())
+        
         gr.HTML(
             """
             <div style="
@@ -473,15 +450,14 @@ def create_interface():
 
             trans_title = gr.HTML("<div style='font-weight:700;color:#1f2937 !important;margin-top:14px;margin-bottom:6px;'>Translated Text</div>")
             trans_output = gr.Textbox(value="Translation will appear here...", interactive=False, elem_classes="trans-box", lines=4)
-
-            # ✅ TTS AUDIO OUTPUT - FIXED FOR HUGGING FACE
+            
             tts_output = gr.Audio(
                 label="Translated Speech Output",
                 visible=False,
                 elem_id="tts-player"
             )
-
-            history_html = gr.HTML(value=processor.get_history_display(), visible=True, elem_classes="history-card")
+            
+            history_html = gr.HTML(value="No translations yet. Upload an audio or video file!", visible=True, elem_classes="history-card")
 
         # ---- Language modal ----
         with gr.Column(visible=False) as language_modal:
@@ -518,14 +494,13 @@ def create_interface():
             langs_html = f"<div class='languages-inline'><strong>{src.title()}</strong> <i>→</i> <strong>{tgt.title()}</strong></div>"
             return gr.update(visible=False), langs_html, ""
 
-
-        def process_audio_wrapper(fp):
+        def process_audio_wrapper(state, fp):
             try:
                 audio_btn.add_class("button-loading")
             except Exception:
                 pass
             try:
-                res_msg, stat, tts_file = processor.process_audio_file(fp)
+                state, res_msg, stat, tts_file = processor.process_audio_file(state, fp)
                 processor.status = stat
                 
                 if stat and "processing" in str(stat).lower():
@@ -537,16 +512,17 @@ def create_interface():
                 
                 status_html = f"<div style='display:flex;align-items:center;gap:10px'>{badge}<div style='font-weight:700;color:#374151;margin-left:6px'>{res_msg}</div></div>"
                 
-                # ✅ FIX: Return proper updates for all outputs
-                orig_text = processor.current_transcription or "No speech detected"
-                trans_text = processor.current_translation or "No translation available"
+                # Get texts from session state
+                orig_text = state['current_transcription'] or "Your speech will be transcribed here..."
+                trans_text = state['current_translation'] or "Translation will appear here..."
                 
                 return (
+                    state,
                     status_html, 
                     orig_text, 
                     trans_text, 
                     gr.update(value=tts_file, visible=tts_file is not None),
-                    processor.get_history_display()
+                    processor.get_history_display(state)
                 )
             finally:
                 try:
@@ -554,13 +530,13 @@ def create_interface():
                 except Exception:
                     pass
 
-        def process_video_wrapper(fp):
+        def process_video_wrapper(state, fp):
             try:
                 video_btn.add_class("button-loading")
             except Exception:
                 pass
             try:
-                res_msg, stat, tts_file = processor.process_video_file(fp)
+                state, res_msg, stat, tts_file = processor.process_video_file(state, fp)
                 processor.status = stat
                 
                 if stat and "processing" in str(stat).lower():
@@ -572,16 +548,17 @@ def create_interface():
                 
                 status_html = f"<div style='display:flex;align-items:center;gap:10px'>{badge}<div style='font-weight:700;color:#374151;margin-left:6px'>{res_msg}</div></div>"
                 
-                # ✅ FIX: Return proper updates for all outputs
-                orig_text = processor.current_transcription or "No speech detected"
-                trans_text = processor.current_translation or "No translation available"
+                # Get texts from session state
+                orig_text = state['current_transcription'] or "Your speech will be transcribed here..."
+                trans_text = state['current_translation'] or "Translation will appear here..."
                 
                 return (
+                    state,
                     status_html, 
                     orig_text, 
                     trans_text, 
                     gr.update(value=tts_file, visible=tts_file is not None),
-                    processor.get_history_display()
+                    processor.get_history_display(state)
                 )
             finally:
                 try:
@@ -590,7 +567,7 @@ def create_interface():
                     pass
 
         # UI tick function
-        def ui_tick(trigger=""):
+        def ui_tick(state, trigger=""):
             st = getattr(processor, "status", "connected") or "connected"
             st_low = str(st).lower()
             
@@ -618,18 +595,17 @@ def create_interface():
 
             langs_html = f"<div class='languages-inline'><strong>{processor.current_source_lang.title()}</strong> <i>→</i> <strong>{processor.current_target_lang.title()}</strong></div>"
 
-            orig = getattr(processor, "current_transcription", "") or "Your speech will be transcribed here..."
-            trans = getattr(processor, "current_translation", "") or "Translation will appear here..."
+            # Get texts from session state
+            orig_text = state['current_transcription'] or "Your speech will be transcribed here..."
+            trans_text = state['current_translation'] or "Translation will appear here..."
             
-            try:
-                history_val = processor.get_history_display()
-            except Exception:
-                history_val = "<div>No translations yet. Upload an audio or video file!</div>"
+            history_val = processor.get_history_display(state)
 
             return (
+                state,
                 gr.update(value=status_html),
-                gr.update(value=orig),
-                gr.update(value=trans),
+                gr.update(value=orig_text),
+                gr.update(value=trans_text),
                 gr.update(value=history_val, visible=True),
                 gr.update(value=langs_html)
             )
@@ -639,24 +615,26 @@ def create_interface():
         cancel_btn.click(close_language_modal, outputs=language_modal)
         save_lang_btn.click(save_languages, inputs=[source_lang, target_lang], outputs=[language_modal, languages_display, status_trigger])
 
-        # ✅ UPDATED: Connect file processing with proper outputs
+        # ✅ UPDATED: Connect file processing with proper outputs including session state
         audio_btn.click(
             process_audio_wrapper, 
-            inputs=[audio_file], 
-            outputs=[audio_status, asr_output, trans_output, tts_output, history_html]
+            inputs=[session_state, audio_file], 
+            outputs=[session_state, audio_status, asr_output, trans_output, tts_output, history_html]
         )
         
         video_btn.click(
             process_video_wrapper, 
-            inputs=[video_file], 
-            outputs=[video_status, asr_output, trans_output, tts_output, history_html]
+            inputs=[session_state, video_file], 
+            outputs=[session_state, video_status, asr_output, trans_output, tts_output, history_html]
         )
 
         # Timer for UI updates
         update_timer = gr.Timer(1.0)
         update_timer.tick(
             fn=ui_tick,
+            inputs=[session_state],
             outputs=[
+                session_state,
                 status_display,
                 asr_output,
                 trans_output,
