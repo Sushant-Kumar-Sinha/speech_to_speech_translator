@@ -21,8 +21,8 @@ A real-time multilingual speech translation system that converts speech between 
 
 | Source Languages | Target Languages |
 |-----------------|------------------|
-| 🇺🇸 English      | 🇮🇳 Hindi         |
-| 🇮🇳 Hindi        | 🇺🇸 English       |
+| 🇮🇳 English      | 🇮🇳 Hindi         |
+| 🇮🇳 Hindi        | 🇮🇳 English       |
 |                  | 🇮🇳 Bengali       |
 |                  | 🇮🇳 Tamil         |
 |                  | 🇮🇳 Telugu        |
@@ -33,7 +33,7 @@ A real-time multilingual speech translation system that converts speech between 
 |                  | 🇮🇳 Punjabi       |
 |                  | 🇮🇳 Odia          |
 |                  | 🇮🇳 Assamese      |
-|                  | 🇵🇰 Urdu          |
+|                  | 🇮🇳 Urdu          |
 
 ## 🏗️ System Architecture
 
@@ -67,9 +67,12 @@ Usage:-
 
 speech_to_speech_translator/
 
-├── app.py                 # Main Gradio application
+├── app.py       # Main Gradio application
+
 ├── model.py              # AI models (Whisper, NLLB, TTS)
+
 ├── requirements.txt       # Python dependencies
+
 └── README.md             # Project documentation
 
 Models Used:
