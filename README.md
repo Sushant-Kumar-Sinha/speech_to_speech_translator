@@ -67,8 +67,11 @@ Usage:-
 
 speech_to_speech_translator/
 ├── app.py                 # Main Gradio application
+
 ├── model.py              # AI models (Whisper, NLLB, TTS)
+
 ├── requirements.txt       # Python dependencies
+
 └── README.md             # Project documentation
 
 Models Used:
