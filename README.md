@@ -1,13 +1,3 @@
-metadata
-title: Speech To Speech Translator
-emoji: 🔊
-colorFrom: blue
-colorTo: green
-sdk: gradio
-sdk_version: 5.49.1
-app_file: app.py
-pinned: false
-
 # Speech-to-Speech Translator 🈺
 
 A real-time multilingual speech translation system that converts speech between English, Hindi, and 10+ other Indian languages using state-of-the-art AI models.
@@ -87,6 +77,24 @@ Models Used:
 1. ASR: OpenAI Whisper (tiny for English, Medium for Hindi)
 2. Translation: Facebook NLLB-200 Distilled 600M
 3. TTS: Google Text-to-Speech
+
+   metadata
+   
+title: Speech To Speech Translator
+
+emoji: 🔊
+
+colorFrom: blue
+
+colorTo: green
+
+sdk: gradio
+
+sdk_version: 5.49.1
+
+app_file: app.py
+
+pinned: false
 
 📝 License
 This project is licensed under the MIT License - see the LICENSE file for details.
