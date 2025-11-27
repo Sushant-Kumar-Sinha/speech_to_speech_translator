@@ -54,7 +54,7 @@ Translated Audio Output
    
 git clone https://github.com/Sushant-Kumar-Sinha/speech_to_speech_translator.git
 
-cd speech_to_speech_translato
+cd speech_to_speech_translation
 
 Usage:-
 
