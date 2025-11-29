@@ -31,8 +31,6 @@ A real-time multilingual speech translation system that converts speech between 
 |                  | 🇮🇳 Kannada       |
 |                  | 🇮🇳 Malayalam     |
 |                  | 🇮🇳 Punjabi       |
-|                  | 🇮🇳 Odia          |
-|                  | 🇮🇳 Assamese      |
 |                  | 🇮🇳 Urdu          |
 
 ## 🏗️ System Architecture
