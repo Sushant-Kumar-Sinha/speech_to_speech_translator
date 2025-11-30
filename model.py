@@ -189,10 +189,16 @@ class LowLatencyTranslator:
                 forced_task = "transcribe"
                 model_type = "tiny"
             else:
-                # For other languages, use medium model without forcing language
+                # ✅ FIX: FORCE LANGUAGE FOR OTHER INDIAN LANGUAGES
                 processor = self.asr_processor_other
                 model = self.asr_model_other
-                forced_language = None  # No forced language - let Whisper auto-detect
+                # Map language names to Whisper language codes
+                lang_map = {
+                    'bengali': 'bn', 'tamil': 'ta', 'telugu': 'te', 'marathi': 'mr',
+                    'gujarati': 'gu', 'kannada': 'kn', 'malayalam': 'ml', 'punjabi': 'pa',
+                    'odia': 'or', 'assamese': 'as', 'urdu': 'ur'
+                }
+                forced_language = lang_map.get(self.source_lang.lower(), 'en')
                 forced_task = "transcribe"
                 model_type = "medium"
             
@@ -208,22 +214,22 @@ class LowLatencyTranslator:
             
             with torch.no_grad():
                 if forced_language:
-                    # For English and Hindi - force specific language
+                    # ✅ NOW ALL LANGUAGES GET FORCED LANGUAGE
                     generated_ids = model.generate(
                         inputs.input_features,
-                        language=forced_language,
+                        language=forced_language,  # This forces the correct script output
                         task=forced_task,
                         max_length=100,
-                        num_beams=3,  # Reduced for speed
+                        num_beams=3,
                         temperature=0.0,
                     )
                 else:
-                    # For other languages - no forced language (auto-detect)
+                    # This case should never happen now since all languages have forced_language
                     generated_ids = model.generate(
                         inputs.input_features,
                         task=forced_task,
                         max_length=100,
-                        num_beams=3,  # Reduced for speed
+                        num_beams=3,
                         temperature=0.0,
                     )
             
