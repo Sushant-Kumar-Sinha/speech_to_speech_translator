@@ -9,10 +9,10 @@ A real-time multilingual speech translation system that converts speech between 
 ## ✨ Features
 
 - **🎤 Speech Recognition**: Convert audio/video files to text using Whisper ASR
-- **🌍 Multilingual Translation**: Translate between 13 Indian languages using Facebook NLLB
+- **🌍 Multilingual Translation**: Translate between 11 Indian languages using Facebook NLLB
 - **🔊 Text-to-Speech**: Generate natural sounding speech in target language
 - **📁 File Support**: Process both audio (MP3, WAV) and video (MP4) files
-- **⚡ Low Latency**: Optimized model selection (Whisper-base for English, Whisper-medium for Hindi)
+- **⚡ Low Latency**: Optimized model selection (Whisper-tiny for English, Whisper-medium for other language for better accuracy)
 - **💾 Translation Cache**: Smart caching for faster repeated translations
 - **📱 Beautiful UI**: Gradio-based intuitive web interface
 - **🔄 Real-time Processing**: Fast inference with model warm-up
