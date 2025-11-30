@@ -1,6 +1,6 @@
 # Speech-to-Speech Translator 🈺
 
-A real-time multilingual speech translation system that converts speech between English, Hindi, and 10+ other Indian languages using state-of-the-art AI models.
+A real-time multilingual speech translation system that converts speech between English, Hindi, and 10 other Indian languages using state-of-the-art AI models.
 
 ## 🌟 Live Demo
 
@@ -23,15 +23,15 @@ A real-time multilingual speech translation system that converts speech between 
 |-----------------|------------------|
 | 🇮🇳 English      | 🇮🇳 Hindi         |
 | 🇮🇳 Hindi        | 🇮🇳 English       |
-|                  | 🇮🇳 Bengali       |
-|                  | 🇮🇳 Tamil         |
-|                  | 🇮🇳 Telugu        |
-|                  | 🇮🇳 Marathi       |
-|                  | 🇮🇳 Gujarati      |
-|                  | 🇮🇳 Kannada       |
-|                  | 🇮🇳 Malayalam     |
-|                  | 🇮🇳 Punjabi       |
-|                  | 🇮🇳 Urdu          |
+| 🇮🇳 Bengali      | 🇮🇳 Bengali       |
+| 🇮🇳 Marathi      | 🇮🇳 Tamil         |
+| 🇮🇳 Telugu       | 🇮🇳 Telugu        |
+| 🇮🇳 Marathi      | 🇮🇳 Marathi       |
+| 🇮🇳 Gujarati     | 🇮🇳 Gujarati      |
+| 🇮🇳 Kannada      | 🇮🇳 Kannada       |
+| 🇮🇳 Malayalam    | 🇮🇳 Malayalam     |
+| 🇮🇳 Punjabi      | 🇮🇳 Punjabi       |
+| 🇮🇳 Urdu         | 🇮🇳 Urdu          |
 
 ## 🏗️ System Architecture
 
