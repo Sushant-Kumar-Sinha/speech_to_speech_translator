@@ -24,7 +24,7 @@ A real-time multilingual speech translation system that converts speech between 
 | 🇮🇳 English      | 🇮🇳 Hindi         |
 | 🇮🇳 Hindi        | 🇮🇳 English       |
 | 🇮🇳 Bengali      | 🇮🇳 Bengali       |
-| 🇮🇳 Marathi      | 🇮🇳 Tamil         |
+| 🇮🇳 Tamil        | 🇮🇳 Tamil         |
 | 🇮🇳 Telugu       | 🇮🇳 Telugu        |
 | 🇮🇳 Marathi      | 🇮🇳 Marathi       |
 | 🇮🇳 Gujarati     | 🇮🇳 Gujarati      |
