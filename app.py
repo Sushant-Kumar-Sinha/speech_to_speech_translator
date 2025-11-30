@@ -158,14 +158,9 @@ class AudioProcessor:
             duration = len(audio) / sr
             print(f"✅ Loaded audio file ({duration:.1f}s)")
             
-            # ✅ FIX: Explicitly set source language for ASR
-            if self.current_source_lang.lower() == "hindi":
-                self.translator.source_lang = "hindi"
-                forced_lang = "hindi"
-            else:
-                self.translator.source_lang = "english" 
-                forced_lang = "english"
-                
+            # ✅ FIX: Use the actual selected source language
+            self.translator.source_lang = self.current_source_lang
+            forced_lang = self.current_source_lang
             print(f"🔊 FORCING ASR LANGUAGE: {forced_lang}")
             
             # Perform ASR
@@ -757,8 +752,8 @@ def create_interface():
             with gr.Column(elem_classes="header-gradient"):
                 gr.HTML("""
                     <div style="position: relative; z-index: 2;">
-                        <h1 class="main-title">🎙️ Speech To Speech Translator</h1>
-                        <p class="subtitle">Real-time multilingual speech translation</p>
+                        <h1 class="main-title">🎙️ Speech Translator Pro</h1>
+                        <p class="subtitle">Real-time multilingual speech translation with AI-powered accuracy</p>
                     </div>
                 """)
             
@@ -845,7 +840,7 @@ def create_interface():
                             label="",
                             show_label=False
                         )
-                        audio_btn = gr.Button("🎙️ Translate Audio", elem_classes="btn-primary", size="lg")
+                        audio_btn = gr.Button("🚀 Translate Audio", elem_classes="btn-primary", size="lg")
                         audio_status = gr.HTML(visible=False)
                     
                     # Video Upload Card - MORE COMPACT
@@ -935,9 +930,6 @@ def create_interface():
         def save_languages(src, tgt):
             """Save language settings"""
             src = src.lower()
-            if src not in ["english", "hindi"]:
-                src = "english"
-        
             msg, status = processor.change_languages(src, tgt)
             processor.current_source_lang = src
             processor.current_target_lang = tgt
