@@ -117,7 +117,6 @@ class NLLBTranslator:
 
         return translated_text
 
-
 # -------------------- LOW LATENCY TRANSLATOR --------------------
 class LowLatencyTranslator:
     def __init__(self):
@@ -126,8 +125,8 @@ class LowLatencyTranslator:
         self.asr_processor = None  # This will be the active processor
         self.asr_model_en = None   # Fast model for English
         self.asr_processor_en = None
-        self.asr_model_hi = None   # Better model for Hindi
-        self.asr_processor_hi = None
+        self.asr_model_other = None   # Model for other languages
+        self.asr_processor_other = None
         self.translator = None
         self.tts = None
 
@@ -137,7 +136,10 @@ class LowLatencyTranslator:
 
         self.whisper_lang_map = {
             'english': 'en',
-            'hindi': 'hi'
+            'hindi': 'hi',
+            'bengali': 'bn', 'tamil': 'ta', 'telugu': 'te', 'marathi': 'mr',
+            'gujarati': 'gu', 'kannada': 'kn', 'malayalam': 'ml', 'punjabi': 'pa',
+            'odia': 'or', 'assamese': 'as', 'urdu': 'ur'
         }
 
         self.load_models()
@@ -147,23 +149,23 @@ class LowLatencyTranslator:
     def load_models(self):
         print("🔄 Loading optimized ASR models...")
         
-        # Fast model for English (whisper-base)
-        print("📥 Loading whisper-base for English...")
+        # Fast model for English (whisper-tiny)
+        print("📥 Loading whisper-tiny for English...")
         self.asr_processor_en = WhisperProcessor.from_pretrained("openai/whisper-tiny")
         self.asr_model_en = WhisperForConditionalGeneration.from_pretrained("openai/whisper-tiny")
         self.asr_model_en.eval()
-        
-        # Better model for Hindi (whisper-medium)
-        print("📥 Loading whisper-medium for Hindi...")
-        self.asr_processor_hi = WhisperProcessor.from_pretrained("openai/whisper-medium")
-        self.asr_model_hi = WhisperForConditionalGeneration.from_pretrained("openai/whisper-medium")
-        self.asr_model_hi.eval()
+
+        # Model for other languages (whisper-medium)
+        print("📥 Loading whisper-medium for other languages...")
+        self.asr_processor_other = WhisperProcessor.from_pretrained("openai/whisper-medium")
+        self.asr_model_other = WhisperForConditionalGeneration.from_pretrained("openai/whisper-medium")
+        self.asr_model_other.eval()
         
         # Set default to English model for compatibility
         self.asr_model = self.asr_model_en
         self.asr_processor = self.asr_processor_en
         
-        print("✅ ASR models loaded (base for English, medium for Hindi)")
+        print("✅ ASR models loaded (tiny for English, medium for other languages)")
 
         self.translator = NLLBTranslator()
         self.translator.load_models()
@@ -175,23 +177,28 @@ class LowLatencyTranslator:
         try:
             # Select the appropriate model based on current language
             if self.source_lang.lower() == 'hindi':
-                processor = self.asr_processor_hi
-                model = self.asr_model_hi
+                processor = self.asr_processor_other
+                model = self.asr_model_other
                 forced_language = 'hi'
+                forced_task = "transcribe"
                 model_type = "medium"
-                # Update the main attributes for any code that might access them
-                self.asr_processor = processor
-                self.asr_model = model
-            else:
+            elif self.source_lang.lower() == 'english':
                 processor = self.asr_processor_en
                 model = self.asr_model_en
                 forced_language = 'en'
-                model_type = "base"
-                # Update the main attributes for any code that might access them
-                self.asr_processor = processor
-                self.asr_model = model
+                forced_task = "transcribe"
+                model_type = "tiny"
+            else:
+                # For other languages, use medium model without forcing language
+                processor = self.asr_processor_other
+                model = self.asr_model_other
+                forced_language = None  # No forced language - let Whisper auto-detect
+                forced_task = "transcribe"
+                model_type = "medium"
             
-            forced_task = "transcribe"
+            # Update the main attributes for any code that might access them
+            self.asr_processor = processor
+            self.asr_model = model
             
             inputs = processor(
                 audio_data, 
@@ -200,21 +207,32 @@ class LowLatencyTranslator:
             )
             
             with torch.no_grad():
-                generated_ids = model.generate(
-                    inputs.input_features,
-                    language=forced_language,
-                    task=forced_task,
-                    max_length=100,
-                    num_beams=3,  # Reduced for speed
-                    temperature=0.0,
-                )
+                if forced_language:
+                    # For English and Hindi - force specific language
+                    generated_ids = model.generate(
+                        inputs.input_features,
+                        language=forced_language,
+                        task=forced_task,
+                        max_length=100,
+                        num_beams=3,  # Reduced for speed
+                        temperature=0.0,
+                    )
+                else:
+                    # For other languages - no forced language (auto-detect)
+                    generated_ids = model.generate(
+                        inputs.input_features,
+                        task=forced_task,
+                        max_length=100,
+                        num_beams=3,  # Reduced for speed
+                        temperature=0.0,
+                    )
             
             transcription = processor.batch_decode(
                 generated_ids, 
                 skip_special_tokens=True
             )[0]
             
-            print(f"🔊 ASR Result [{forced_language}, model:{model_type}]: {transcription}")
+            print(f"🔊 ASR Result [{self.source_lang}, model:{model_type}]: {transcription}")
             return transcription.strip()
             
         except Exception as e:
