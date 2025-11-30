@@ -75,7 +75,7 @@ speech_to_speech_translator/
 
 Models Used:
 
-1. ASR: OpenAI Whisper (tiny for English, Medium for Hindi)
+1. ASR: OpenAI Whisper (tiny for English, Medium for others)
 2. Translation: Facebook NLLB-200 Distilled 600M
 3. TTS: Google Text-to-Speech
 
