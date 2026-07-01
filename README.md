@@ -1,38 +1,59 @@
-# Speech-to-Speech Translator 🈺
+# Speech-to-Speech Translator 🔊
 
-A real-time multilingual speech translation system that converts speech between English, Hindi, and 10 other Indian languages using state-of-the-art AI models.
+A real-time, multilingual speech translation system that seamlessly bridges communication gaps by converting spoken language between English, Hindi, and 10 regional Indian languages using state-of-the-art AI models.
 
-## 🌟 Live Demo
+[![Deployment Status](https://img.shields.io/badge/Deployment-Hugging%20Face-blue)](https://huggingface.co/spaces/Sushant-Kumar-Sinha/speech-to-speech-translator)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
-🚀 **Try it now!**: [Speech-to-Speech Translator on Hugging Face](https://huggingface.co/spaces/Sushant-Kumar-Sinha/speech-to-speech-translator)
+---
 
 ## ✨ Features
 
-- **🎤 Speech Recognition**: Convert audio/video files to text using Whisper ASR
-- **🌍 Multilingual Translation**: Translate between 11 Indian languages using Facebook NLLB
-- **🔊 Text-to-Speech**: Generate natural sounding speech in target language
-- **📁 File Support**: Process both audio (MP3, WAV) and video (MP4) files
-- **⚡ Low Latency**: Optimized model selection (Whisper-tiny for English, Whisper-medium for other language for better accuracy)
-- **💾 Translation Cache**: Smart caching for faster repeated translations
-- **📱 Beautiful UI**: Gradio-based intuitive web interface
-- **🔄 Real-time Processing**: Fast inference with model warm-up
+* **🎤 Advanced Speech Recognition:** High-fidelity audio/video transcription using OpenAI's Whisper ASR.
+* **🌍 Multilingual Translation:** Context-aware translation across 11 major Indian languages via Facebook's NLLB.
+* **🔊 Natural Text-to-Speech:** Generates expressive, human-like synthesized voice output in the target language.
+* **📁 Diverse File Support:** Native support for processing both audio files (`.mp3`, `.wav`) and video containers (`.mp4`).
+* **⚡ Dual-Engine Low Latency:** Optimized model orchestration (`Whisper-tiny` for swift English processing; `Whisper-medium` for dense regional accuracy).
+* **💾 Smart Translation Cache:** On-the-fly caching to eliminate redundant API/model computation for repeated phrases.
+* **📱 Premium UI/UX:** Responsive, intuitive web interface built natively on Gradio.
+* **🔄 Production Ready:** Features built-in model warm-ups to guarantee immediate real-time processing inference.
+
+---
 
 ## 🗣️ Supported Languages
 
 | Source Languages | Target Languages |
-|-----------------|------------------|
-| 🇮🇳 English      | 🇮🇳 Hindi         |
-| 🇮🇳 Hindi        | 🇮🇳 English       |
-| 🇮🇳 Bengali      | 🇮🇳 Bengali       |
-| 🇮🇳 Tamil        | 🇮🇳 Tamil         |
-| 🇮🇳 Telugu       | 🇮🇳 Telugu        |
-| 🇮🇳 Marathi      | 🇮🇳 Marathi       |
-| 🇮🇳 Gujarati     | 🇮🇳 Gujarati      |
-| 🇮🇳 Kannada      | 🇮🇳 Kannada       |
-| 🇮🇳 Malayalam    | 🇮🇳 Malayalam     |
-| 🇮🇳 Punjabi      | 🇮🇳 Punjabi       |
-| 🇮🇳 Urdu         | 🇮🇳 Urdu          |
+| :--- | :--- |
+| 🇬🇧 English | 🇬🇧 English |
+| 🇮🇳 Hindi | 🇮🇳 Hindi |
+| 🇮🇳 Bengali | 🇮🇳 Bengali |
+| 🇮🇳 Tamil | 🇮🇳 Tamil |
+| 🇮🇳 Telugu | 🇮🇳 Telugu |
+| 🇮🇳 Marathi | 🇮🇳 Marathi |
+| 🇮🇳 Gujarati | 🇮🇳 Gujarati |
+| 🇮🇳 Kannada | 🇮🇳 Kannada |
+| 🇮🇳 Malayalam | 🇮🇳 Malayalam |
+| 🇮🇳 Punjabi | 🇮🇳 Punjabi |
+| 🇮🇳 Urdu | 🇮🇳 Urdu |
 
+---
+
+## 🏗️ System Architecture
+
+```text
+  [ Audio/Video Input ]
+           │
+           ▼
+     [Whisper ASR]    ──> (Extracts & Transcribes Speech to Text)
+           │
+           ▼
+   [NLLB Translator]  ──> (Translates Context Across Indian Languages)
+           │
+           ▼
+     [Google TTS]     ──> (Synthesizes Text into Natural Speech)
+           │
+           ▼
+ [ Translated Audio Output ]
 ## 🏗️ System Architecture
 
 Audio/Video Input
