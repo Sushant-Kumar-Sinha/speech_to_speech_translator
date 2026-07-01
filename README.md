@@ -54,18 +54,6 @@ A real-time, multilingual speech translation system that seamlessly bridges comm
            │
            ▼
  [ Translated Audio Output ]
-## 🏗️ System Architecture
-
-Audio/Video Input
-↓
-[Whisper ASR] → Speech to Text
-↓
-[NLLB Translator] → Text Translation
-↓
-[Google TTS] → Text to Speech
-↓
-Translated Audio Output
-## 🚀 Quick Start
 
 ### Installation
 
@@ -100,23 +88,6 @@ Models Used:
 2. Translation: Facebook NLLB-200 Distilled 600M
 3. TTS: Google Text-to-Speech
 
-   metadata
-   
-title: Speech To Speech Translator
-
-emoji: 🔊
-
-colorFrom: blue
-
-colorTo: green
-
-sdk: gradio
-
-sdk_version: 5.49.1
-
-app_file: app.py
-
-pinned: false
 
 📝 License
 This project is licensed under the MIT License - see the LICENSE file for details.
